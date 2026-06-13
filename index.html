@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="nb">
+<head>
+    <link href='https://fonts.googleapis.com/css?family=Oswald' rel='stylesheet'>
+    <style>
+        body {
+            font-family: 'Oswald', sans-serif;
+            font-size: 80px;
+            color: #FF0000;
+            -webkit-text-stroke-width: 2px;
+            -webkit-text-stroke-color: #000000;
+            background-color: #FFFFFF;
+        }
+
+        .content {
+            width: 90%;
+            margin-left: auto;
+            margin-right: auto;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .hide {
+            visibility: hidden;
+        }
+
+        #paused {
+            font-size: 30px;
+            -webkit-text-stroke-width: 1px;
+        }
+    </style>
+    <title>Timer a?</title>
+</head>
+<body>
+
+<div class="content hide" id="timerWrapper">
+    <span id="timer">00:00:00</span>
+    <span class="hide" id="paused">PAUSE</span>
+</div>
+
+<script type="application/javascript">
+    document.addEventListener("DOMContentLoaded", () => {
+        const timerWrapper = document.querySelector("#timerWrapper");
+        const timerText = document.querySelector("#timer");
+        const pausedText = document.querySelector("#paused");
+        let end = null;
+        let paused = null;
+
+        const queryParams = new URLSearchParams(window.location.search);
+        const timer = queryParams.get("timer");
+        if (timer == null) {
+            timerText.innerText = "Timer not specified";
+            timerWrapper.classList.remove("hide");
+            return;
+        }
+
+        setInterval(() => {
+            fetch(`https://api.j4d.dev/chronoguider/timer/${timer}`)
+                .then(response => {
+                    response.json().then(data => {
+                        end = data.end;
+                        paused = data.paused ? new Date(data.paused) : null;
+                    });
+                })
+                .catch(reason => {
+                    console.error(reason);
+                })
+        }, 3000);
+
+        setInterval(() => {
+            if (end == null) {
+                return;
+            }
+            const endTime = new Date(end).getTime();
+            let nowTime;
+            if (paused != null) {
+                nowTime = paused.getTime();
+                pausedText.classList.remove("hide");
+            } else {
+                nowTime = new Date().getTime();
+                if (!pausedText.classList.contains("hide")) {
+                    pausedText.classList.add("hide");
+                }
+            }
+
+            // get total seconds between the times
+            let delta = Math.max(0, (endTime - nowTime) / 1000); // avoid negative values
+
+            // calculate total hours (including days)
+            const hours = Math.floor(delta / 3600);
+            delta -= hours * 3600;
+
+            // calculate minutes
+            const minutes = Math.floor(delta / 60);
+            delta -= minutes * 60;
+
+            // calculate seconds
+            const seconds = Math.floor(delta);
+
+            timerText.innerText = `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+            timerWrapper.classList.remove("hide");
+        }, 1000);
+    });
+</script>
+</body>
+</html>
