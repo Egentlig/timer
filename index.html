@@ -56,7 +56,7 @@
         }
 
         setInterval(() => {
-            fetch(`https://api.j4d.dev/chronoguider/timer/${timer}`)
+            fetch(`https://api.j4d.dev/streamrig/timer/${timer}`)
                 .then(response => {
                     response.json().then(data => {
                         end = data.end;
