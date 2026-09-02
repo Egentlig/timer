@@ -50,9 +50,7 @@
         const queryParams = new URLSearchParams(window.location.search);
         const timer = queryParams.get("timer");
         if (timer == null) {
-            timerText.innerText = "Timer not specified";
-            timerWrapper.classList.remove("hide");
-            return;
+            timer = "9648365a-2d5e-4450-8067-66330be43988";
         }
 
         setInterval(() => {
