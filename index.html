@@ -48,7 +48,7 @@
         let paused = null;
 
         const queryParams = new URLSearchParams(window.location.search);
-        const timer = queryParams.get("timer");
+        let timer = queryParams.get("timer");
         if (timer == null) {
             timer = "9648365a-2d5e-4450-8067-66330be43988";
         }
